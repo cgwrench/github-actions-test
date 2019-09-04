@@ -1,0 +1,54 @@
+name: Main workflow
+
+on:
+  push:
+    branches:
+    - master
+    tags:
+    - 'v*'
+    paths:
+    - '*'
+    - '!/docs/*'
+    - '!.editorconfig'
+    - '!.gitattributes'
+    - '!.gitignore'
+    - '!*.md'
+    - '!LICENSE'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
+
+    - name: Install .NET Core SDK 2.2
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 2.2.108
+      env:
+        DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+        DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+    # TODO Run tests against multiple .NET Core SDKs.
+    # See https://github.com/actions/setup-dotnet/issues/25.
+    # - name: Install .NET Core SDK 3.0
+    #   uses: actions/setup-dotnet@v1
+    #   with:
+    #     dotnet-version: 3.0.100-preview8-013656
+    #   env:
+    #     DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+    #     DOTNET_CLI_TELEMETRY_OPTOUT: 1
+
+    - name: Display .NET Core SDK information
+      run: dotnet --info
+
+    - name: Build
+      run: dotnet build --configuration Release
+
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --logger trx -p:CollectCoverage=true -p:Exclude="[xunit.*]*" -p:CoverletOutputFormat=cobertura
+
+    - name: Create NuGet packages
+      run: dotnet pack --no-build --configuration Release

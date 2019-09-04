@@ -1,6 +1,7 @@
 name: Main workflow
 
 on:
+  pull_request:
   push:
     branches:
     - master
@@ -51,4 +52,5 @@ jobs:
       run: dotnet test --no-build --configuration Release --logger trx -p:CollectCoverage=true -p:Exclude="[xunit.*]*" -p:CoverletOutputFormat=cobertura
 
     - name: Create NuGet packages
+      if: github.event_name == 'push'
       run: dotnet pack --no-build --configuration Release

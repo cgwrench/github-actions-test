@@ -1,6 +1,6 @@
 # GitHub Actions Test
 
-[![GitHub Actions status][build-status]](https://github.com/cgwrench/github-actions-test)
+![GitHub Actions status][build-status]
 
 A solution used to test GitHub Actions.
 
